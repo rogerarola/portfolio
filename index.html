@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Roger Arola - Audiovisual engineer, music producer and creative</title>
+  <meta name="description" content="Portfolio of Roger Arola: ARLA (melodic techno DJ and producer), Pulso Studios (EDM mixing and mastering) and Far Coaching (web, content, marketing and AI).">
+  <meta name="theme-color" content="#fbfbfa">
+  <link rel="canonical" href="https://rogerarola.com/">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Roger Arola">
+  <meta property="og:description" content="Audiovisual engineer, music producer and creative. ARLA, Pulso Studios, Far Coaching.">
+  <meta property="og:url" content="https://rogerarola.com/">
+  <!-- TODO: add a 1200x630 share image at assets/og.jpg and uncomment
+  <meta property="og:image" content="https://rogerarola.com/assets/og.jpg"> -->
+
+  <script>document.documentElement.classList.add("js");</script>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b0b0d'/%3E%3Ctext x='32' y='43' font-family='Arial,Helvetica,sans-serif' font-weight='900' font-size='30' text-anchor='middle' fill='%23fbfbfa'%3ERA%3C/text%3E%3C/svg%3E">
+  <link rel="preload" href="assets/fonts/AlteHaasGroteskBold.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Roger Arola",
+    "url": "https://rogerarola.com/",
+    "email": "mailto:contact@rogerarola.com",
+    "jobTitle": "Audiovisual engineer, music producer and creative",
+    "sameAs": ["https://arlamusic.com", "https://pulso-studios.com"]
+  }
+  </script>
+</head>
+<body>
+  <a class="skip" href="#work" data-i18n="skip">Skip to content</a>
+
+  <header class="bar">
+    <h1 class="brand">Roger Arola</h1>
+    <nav class="bar-nav" aria-label="Main">
+      <button class="pill pill-ghost" id="aboutOpen" type="button" aria-haspopup="dialog" data-i18n="about">About</button>
+      <div class="lang" role="group" aria-label="Language">
+        <button type="button" data-lang="en" aria-pressed="true">EN</button>
+        <button type="button" data-lang="es" aria-pressed="false">ES</button>
+      </div>
+      <a class="pill pill-solid" href="mailto:contact@rogerarola.com" data-i18n="contact">Contact</a>
+    </nav>
+  </header>
+
+  <main id="work" class="stage">
+    <div class="side side-name" aria-hidden="true">
+      <div class="name-wrap" id="nameWrap"></div>
+    </div>
+
+    <section class="wheel" id="wheel" aria-roledescription="carousel" aria-label="Projects" tabindex="0"></section>
+
+    <div class="side side-info" aria-live="polite">
+      <div class="info" id="info">
+        <h2 class="info-title sr-only" id="infoTitle"></h2>
+        <p class="info-desc" id="infoDesc"></p>
+        <p class="info-role" id="infoRole"></p>
+        <a class="pill pill-line visit" id="visit" href="#" target="_blank" rel="noopener">
+          <span id="visitLabel"></span><span class="arrow" aria-hidden="true">&#8599;</span>
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <p class="bio" data-i18n="bio">Audiovisual engineer, music producer and creative.</p>
+    <nav class="index" id="index" aria-label="Projects"></nav>
+  </footer>
+
+  <div class="intro" id="intro" aria-hidden="true"></div>
+
+  <dialog class="about" id="about" aria-labelledby="aboutLead">
+    <div class="about-inner">
+      <div class="about-top">
+        <span class="brand">Roger Arola</span>
+        <button class="pill pill-ghost" id="aboutClose" type="button" data-i18n="close">Close</button>
+      </div>
+      <p class="about-lead" id="aboutLead" data-i18n="aboutLead">I am an audiovisual systems engineer, music producer and creative. I split my time between my own music, a studio and a coaching company.</p>
+      <ul class="about-list" id="aboutList"></ul>
+      <div class="about-contact">
+        <a class="about-mail" href="mailto:contact@rogerarola.com">contact@rogerarola.com</a>
+        <button class="pill pill-line" id="copyMail" type="button" data-i18n="copy">Copy email</button>
+      </div>
+    </div>
+  </dialog>
+
+  <noscript>
+    <div class="noscript">
+      <h2>Projects</h2>
+      <ul>
+        <li><a href="https://arlamusic.com">ARLA</a> - Melodic techno DJ and producer from Barcelona.</li>
+        <li><a href="https://pulso-studios.com">Pulso Studios</a> - EDM mixing, mastering and music production.</li>
+        <li><a href="https://farcoaching.com">Far Coaching</a> - Team coaching and leadership training. Web, content, marketing and AI.</li>
+      </ul>
+      <p><a href="mailto:contact@rogerarola.com">contact@rogerarola.com</a></p>
+    </div>
+  </noscript>
+
+  <script src="main.js" defer></script>
+</body>
+</html>
