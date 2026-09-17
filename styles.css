@@ -249,7 +249,7 @@ a { color: inherit; }
 }
 .about-list { list-style: none; margin: 0; padding: 0; border-top: 1.5px solid var(--ink); }
 .about-list li {
-  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) auto; gap: 8px 24px; align-items: baseline;
+  display: grid; grid-template-columns: 32% minmax(0, 1fr) auto; gap: 8px 24px; align-items: baseline;
   padding: 18px 0;
 }
 .about-list li + li { border-top: 1px solid var(--line); }
