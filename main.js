@@ -66,7 +66,6 @@ const COPY = {
     copy: "Copy email",
     copied: "Copied",
     visit: "Visit",
-    bio: "Audiovisual engineer, music producer and creative.",
     aboutLead:
       "I am an audiovisual systems engineer, music producer and creative. I split my time between my own music, a studio and a coaching company.",
     carousel: "Projects",
@@ -79,7 +78,6 @@ const COPY = {
     copy: "Copiar email",
     copied: "Copiado",
     visit: "Visitar",
-    bio: "Ingeniero audiovisual, productor musical y creativo.",
     aboutLead:
       "Soy ingeniero de sistemas audiovisuales, productor musical y creativo. Reparto mi tiempo entre mi propia música, un estudio y una empresa de coaching.",
     carousel: "Proyectos",
