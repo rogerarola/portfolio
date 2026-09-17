@@ -4,59 +4,55 @@
    ========================================================================== */
 
 const EMAIL = "contact@rogerarola.com";
-const SHOTS_PER_PROJECT = 3; // assets/shots/<id>-1.jpg ... <id>-3.jpg (run `npm run shots`)
+const REPEATS = 3; // the project list is repeated so the wheel is endless and always full
 
 const PROJECTS = [
   {
     id: "arla",
-    name: ["ARLA"],
+    name: "ARLA",
     url: "https://arlamusic.com",
     domain: "arlamusic.com",
-    // used only while assets/shots/arla-*.jpg do not exist
-    cover: "https://arlamusic.com/assets/og-image.jpg",
-    cardBg: "#07070b",
-    cardInk: "#f4f4f6",
     en: {
-      desc: "My melodic techno project from Barcelona. Originals, remixes and edits, supported by GORDO, SCRIPT and braev.",
+      desc: "My music artist project. Melodic techno originals, remixes and edits, supported by GORDO, SCRIPT and braev.",
       role: "DJ and music producer",
+      tags: ["DJ", "Music production", "Remixes"],
     },
     es: {
-      desc: "Mi proyecto de melodic techno desde Barcelona. Originales, remixes y edits, con soporte de GORDO, SCRIPT y braev.",
+      desc: "Mi proyecto como artista musical. Originales, remixes y edits de melodic techno, con soporte de GORDO, SCRIPT y braev.",
       role: "DJ y productor musical",
+      tags: ["DJ", "Producción musical", "Remixes"],
     },
   },
   {
     id: "pulso",
-    name: ["Pulso", "Studios"],
+    name: "Pulso Studios",
     url: "https://pulso-studios.com",
     domain: "pulso-studios.com",
-    cover: "https://pulso-studios.com/og-image.jpg",
-    cardBg: "#0a0a0a",
-    cardInk: "#ffffff",
     en: {
       desc: "My mixing, mastering and music production studio for EDM artists and labels. Raw ideas turned into release-ready records.",
       role: "Mixing and mastering engineer, producer",
+      tags: ["Mixing", "Mastering", "Music production"],
     },
     es: {
       desc: "Mi estudio de mezcla, mastering y producción musical para artistas y sellos de EDM. De la idea en bruto al disco listo para publicar.",
       role: "Ingeniero de mezcla y mastering, productor",
+      tags: ["Mezcla", "Mastering", "Producción musical"],
     },
   },
   {
     id: "far",
-    name: ["Far", "Coaching"],
+    name: "Far Coaching",
     url: "https://farcoaching.com",
     domain: "farcoaching.com",
-    cover: "",
-    cardBg: "#ffffff",
-    cardInk: "#0b0b0d",
     en: {
       desc: "Team coaching and leadership training company. I take care of their websites, content, marketing, AI and tech.",
       role: "Web, content, marketing and AI",
+      tags: ["Web", "Content", "Marketing", "AI"],
     },
     es: {
       desc: "Empresa de coaching de equipos y formación en liderazgo. Me encargo de sus webs, contenido, marketing, IA y tecnología.",
       role: "Web, contenido, marketing e IA",
+      tags: ["Web", "Contenido", "Marketing", "IA"],
     },
   },
 ];
@@ -96,9 +92,9 @@ const $ = (s, el = document) => el.querySelector(s);
 const root = document.documentElement;
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 const EASE = "cubic-bezier(0.16, 1, 0.3, 1)";
+const ARROW = '<svg class="item-arrow" viewBox="0 0 256 256" aria-hidden="true"><use href="#i-arrow"/></svg>';
 
 const wheel = $("#wheel");
-const nameWrap = $("#nameWrap");
 const info = $("#info");
 const indexNav = $("#index");
 const about = $("#about");
@@ -110,52 +106,26 @@ try {
   else if (/^(es|ca|gl|eu)/i.test(navigator.language || "")) lang = "es";
 } catch (_) { /* storage can be blocked, default stays */ }
 
-/* Cards are interleaved (arla, pulso, far, arla, ...) so every step of the
-   wheel lands on a different project and the stack always looks full. */
-const cards = [];
-for (let s = 1; s <= SHOTS_PER_PROJECT; s++) {
-  PROJECTS.forEach((project, p) => cards.push({ project, p, shot: s }));
-}
-const COUNT = cards.length;
+const items = [];
+for (let r = 0; r < REPEATS; r++) PROJECTS.forEach((project, p) => items.push({ project, p }));
+const COUNT = items.length;
 
 /* ------------------------------------------------------------------ build */
 
-function buildCards() {
-  cards.forEach((c, i) => {
+function buildItems() {
+  items.forEach((it, i) => {
     const a = document.createElement("a");
-    a.className = "card";
-    a.href = c.project.url;
+    a.className = "item";
+    a.href = it.project.url;
     a.target = "_blank";
     a.rel = "noopener";
     a.draggable = false;
-    a.style.setProperty("--card-bg", c.project.cardBg);
-    a.style.setProperty("--card-ink", c.project.cardInk);
     a.dataset.i = i;
-
-    const fb = document.createElement("span");
-    fb.className = "card-fallback";
-    fb.innerHTML = c.project.name.join("<br>");
-    a.appendChild(fb);
-
-    const img = new Image();
-    img.alt = "";
-    img.decoding = "async";
-    img.draggable = false;
-    img.addEventListener("load", () => img.classList.add("is-loaded"));
-    img.addEventListener("error", function onErr() {
-      // 1st failure: local screenshot missing -> try the remote cover. 2nd: keep the typographic card.
-      if (!img.dataset.fallback && c.project.cover) {
-        img.dataset.fallback = "1";
-        img.src = c.project.cover;
-      } else {
-        img.removeEventListener("error", onErr);
-        img.remove();
-      }
-    });
-    img.src = `assets/shots/${c.project.id}-${c.shot}.jpg`;
-    a.appendChild(img);
-
-    c.el = a;
+    a.innerHTML =
+      `<span class="item-stroke" aria-hidden="true">${it.project.name}</span>` +
+      `<span class="item-fill"><span>${it.project.name}</span>${ARROW}</span>`;
+    it.el = a;
+    it.fill = a.querySelector(".item-fill");
     wheel.appendChild(a);
   });
 }
@@ -164,7 +134,7 @@ function buildIndex() {
   PROJECTS.forEach((project, p) => {
     const b = document.createElement("button");
     b.type = "button";
-    b.textContent = project.name.join(" ");
+    b.textContent = project.name;
     b.addEventListener("click", () => goToProject(p));
     indexNav.appendChild(b);
   });
@@ -175,59 +145,66 @@ function buildAboutList() {
   ul.innerHTML = "";
   PROJECTS.forEach((project) => {
     const li = document.createElement("li");
-    li.innerHTML = `<strong>${project.name.join(" ")}</strong><span>${project[lang].role}</span>
-      <a href="${project.url}" target="_blank" rel="noopener">${project.domain} <span aria-hidden="true">&#8599;</span></a>`;
+    li.innerHTML = `<strong>${project.name}</strong><span>${project[lang].role}</span>
+      <a href="${project.url}" target="_blank" rel="noopener">${project.domain}</a>`;
     ul.appendChild(li);
   });
 }
 
 /* ------------------------------------------------------------------ wheel */
 
-let progress = 0;      // current position, in cards (float, unbounded)
+let progress = 0;      // current position, in items (float, unbounded)
 let target = 0;        // where we are heading
-let introT = reduceMotion.matches ? 1 : 0; // 0 -> cards below the screen, 1 -> in place
+let introT = reduceMotion.matches ? 1 : 0; // 0 -> names below the screen, 1 -> in place
 let raf = 0;
-let cardH = 0;
-let isMobile = false;
+let fs = 100;          // wheel font size in px
+let pitch = 100;       // vertical distance between two names
 let activeProject = -1;
 let snapTimer = 0;
 
 const mod = (n, m) => ((n % m) + m) % m;
+const clamp01 = (n) => Math.min(1, Math.max(0, n));
 
+/* Type as large as the column allows: the longest name (plus its arrow) must fit. */
 function measure() {
-  cardH = cards[0].el.offsetHeight;
-  isMobile = window.matchMedia("(max-width: 900px)").matches;
+  wheel.style.setProperty("--fs", "100px");
+  let widest = 1;
+  items.slice(0, PROJECTS.length).forEach((it) => {
+    widest = Math.max(widest, it.el.querySelector(".item-stroke").offsetWidth);
+  });
+  const avail = wheel.clientWidth;
+  const small = window.matchMedia("(max-width: 820px)").matches;
+  const byWidth = (avail / (widest + (small ? 4 : 86))) * 100; // 86 = arrow + gap at 100px (no arrow on small screens)
+  const byHeight = wheel.clientHeight / 3.1;           // always room for the neighbours
+  fs = Math.floor(Math.min(byWidth, byHeight, window.innerWidth * 0.1));
+  pitch = fs * (small ? 1.24 : 1.04);
+  wheel.style.setProperty("--fs", fs + "px");
 }
 
 function render() {
-  const peek = isMobile ? 20 : 34;
-  const ratio = 0.8;
   const vh = window.innerHeight;
-
   for (let i = 0; i < COUNT; i++) {
     // signed distance from the active slot, wrapped so the wheel is endless
-    let d = mod(i - progress + COUNT / 2, COUNT) - COUNT / 2;
+    const d = mod(i - progress + COUNT / 2, COUNT) - COUNT / 2;
     const a = Math.abs(d);
-    const sign = d < 0 ? -1 : 1;
 
-    const scale = Math.pow(0.85, a);
-    const cumulativePeek = (peek * (1 - Math.pow(ratio, a))) / (1 - ratio);
-    let y = sign * ((cardH / 2) * (1 - scale) + cumulativePeek);
+    let y = d * pitch;
+    const x = a * a * fs * 0.09;                        // slight drum curve
+    const scale = 1 - Math.min(a, 3) * 0.035;
 
-    // intro: every card travels up from below the viewport, the front one first
+    // intro: every name travels up from below the viewport, the active one first
     if (introT < 1) {
-      const local = Math.min(1, Math.max(0, introT * 1.6 - a * 0.12));
-      const eased = 1 - Math.pow(1 - local, 4);
-      y += (1 - eased) * vh;
+      const local = clamp01(introT * 1.6 - a * 0.14);
+      y += (1 - (1 - Math.pow(1 - local, 4))) * vh;
     }
 
-    const opacity = a <= 3.2 ? 1 : Math.max(0, 1 - (a - 3.2) / 0.9);
-    const el = cards[i].el;
-    el.style.transform = `translate3d(0, ${y.toFixed(2)}px, 0) scale(${scale.toFixed(4)})`;
-    el.style.opacity = opacity.toFixed(3);
-    el.style.zIndex = String(1000 - Math.round(a * 100));
-    el.style.setProperty("--veil", Math.min(0.5, a * 0.1).toFixed(3));
-    el.style.visibility = opacity === 0 ? "hidden" : "visible";
+    const it = items[i];
+    const visible = a < 3.4;
+    it.el.style.visibility = visible ? "visible" : "hidden";
+    if (!visible) continue;
+    it.el.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) scale(${scale.toFixed(4)})`;
+    it.el.style.opacity = (a <= 1 ? 1 : clamp01(1 - (a - 1) / 2)).toFixed(3);
+    it.fill.style.opacity = clamp01(1 - a * 1.7).toFixed(3);
   }
 }
 
@@ -258,24 +235,24 @@ function step(n) {
 }
 
 function goToProject(p) {
-  // shortest way to a card of that project
+  // shortest way to an item of that project
   const base = Math.round(target);
   let best = null;
   for (let k = -COUNT; k <= COUNT; k++) {
-    if (cards[mod(base + k, COUNT)].p === p && (best === null || Math.abs(k) < Math.abs(best))) best = k;
+    if (items[mod(base + k, COUNT)].p === p && (best === null || Math.abs(k) < Math.abs(best))) best = k;
   }
   if (best) step(best);
 }
 
 function syncActive() {
   const idx = mod(Math.round(progress), COUNT);
-  cards.forEach((c, i) => {
+  items.forEach((it, i) => {
     const on = i === idx;
-    c.el.classList.toggle("is-active", on);
-    c.el.tabIndex = on ? 0 : -1;
-    c.el.setAttribute("aria-hidden", on ? "false" : "true");
+    it.el.classList.toggle("is-active", on);
+    it.el.tabIndex = on ? 0 : -1;
+    it.el.setAttribute("aria-hidden", on ? "false" : "true");
   });
-  const p = cards[idx].p;
+  const p = items[idx].p;
   if (p !== activeProject) {
     const dir = target >= progress ? 1 : -1;
     const first = activeProject === -1;
@@ -286,80 +263,36 @@ function syncActive() {
 
 /* ------------------------------------------------------------ side content */
 
-function fitName(layer) {
-  // scale the type so the longest line fills the column (bold, poster-like)
-  const box = nameWrap.getBoundingClientRect();
-  layer.style.fontSize = "100px";
-  let widest = 1;
-  layer.querySelectorAll(".name-line > span").forEach((s) => {
-    widest = Math.max(widest, s.getBoundingClientRect().width);
-  });
-  const lines = layer.querySelectorAll(".name-line").length;
-  const byWidth = ((box.width - 4) / widest) * 100;
-  const byHeight = box.height / (lines * 1.02);
-  const cap = isMobile ? 96 : window.innerWidth * 0.12;
-  layer.style.fontSize = Math.floor(Math.min(byWidth, byHeight, cap)) + "px";
+function applyInfo(project) {
+  $("#infoTitle").textContent = project.name;
+  $("#infoDesc").textContent = project[lang].desc;
+  $("#infoTags").innerHTML = project[lang].tags.map((t) => `<li>${t}</li>`).join("");
+  $("#visit").href = project.url;
+  $("#visitLabel").textContent = `${COPY[lang].visit} ${project.domain}`;
 }
 
 function showProject(p, dir, first) {
   const project = PROJECTS[p];
-  const animate = !reduceMotion.matches;
 
-  // --- name (mask reveal, line by line)
-  const old = nameWrap.querySelectorAll(".name-layer");
-  old.forEach((layer) => {
-    if (!animate) return layer.remove();
-    const spans = layer.querySelectorAll(".name-line > span");
-    spans.forEach((s, i) => {
-      s.animate([{ transform: "translateY(0)" }, { transform: `translateY(${-110 * dir}%)` }], {
-        duration: 320, delay: i * 30, easing: "cubic-bezier(0.7, 0, 0.84, 0)", fill: "forwards",
-      });
-    });
-    setTimeout(() => layer.remove(), 320 + spans.length * 30 + 40);
-  });
-
-  const layer = document.createElement("p");
-  layer.className = "name-layer";
-  project.name.forEach((line) => {
-    const mask = document.createElement("span");
-    mask.className = "name-line";
-    const inner = document.createElement("span");
-    inner.textContent = line;
-    mask.appendChild(inner);
-    layer.appendChild(mask);
-  });
-  nameWrap.appendChild(layer);
-  fitName(layer);
-  if (animate) {
-    layer.querySelectorAll(".name-line > span").forEach((s, i) => {
-      s.animate([{ transform: `translateY(${110 * dir}%)` }, { transform: "translateY(0)" }], {
-        duration: 900, delay: (first ? 0 : 260) + i * 70, easing: EASE, fill: "backwards",
-      });
-    });
-  }
-
-  // --- description
-  const apply = () => {
-    $("#infoTitle").textContent = project.name.join(" ");
-    $("#infoDesc").textContent = project[lang].desc;
-    $("#infoRole").textContent = project[lang].role;
-    $("#visit").href = project.url;
-    $("#visitLabel").textContent = `${COPY[lang].visit} ${project.domain}`;
-  };
-  if (!animate || first) {
-    apply();
+  if (reduceMotion.matches || first) {
+    applyInfo(project);
   } else {
     info.animate([{ opacity: 1, transform: "translateY(0)" }, { opacity: 0, transform: `translateY(${-10 * dir}px)` }], {
       duration: 160, easing: "ease-in", fill: "forwards",
     }).finished.then(() => {
-      apply();
-      info.animate([{ opacity: 0, transform: `translateY(${16 * dir}px)` }, { opacity: 1, transform: "translateY(0)" }], {
+      applyInfo(PROJECTS[activeProject]);
+      info.animate([{ opacity: 0, transform: `translateY(${18 * dir}px)` }, { opacity: 1, transform: "translateY(0)" }], {
         duration: 700, easing: EASE, fill: "forwards",
+      });
+      // chips arrive one after another
+      [...$("#infoTags").children].forEach((li, i) => {
+        li.animate([{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "translateY(0)" }], {
+          duration: 500, delay: 80 + i * 60, easing: EASE, fill: "backwards",
+        });
       });
     });
   }
 
-  // --- index
   [...indexNav.children].forEach((b, i) => b.setAttribute("aria-current", i === p ? "true" : "false"));
 }
 
@@ -394,9 +327,8 @@ function bindInput() {
   // drag / swipe (pointer events cover mouse, touch and pen)
   let dragging = false, moved = false, startY = 0, startTarget = 0, lastY = 0, lastT = 0, velocity = 0;
 
-  const stage = $(".stage");
-  stage.addEventListener("pointerdown", (e) => {
-    if (e.button !== 0 || e.target.closest(".side-info a, .side-info button")) return;
+  wheel.addEventListener("pointerdown", (e) => {
+    if (e.button !== 0) return;
     dragging = true; moved = false;
     startY = lastY = e.clientY; startTarget = target; lastT = performance.now(); velocity = 0;
     clearTimeout(snapTimer);
@@ -409,7 +341,7 @@ function bindInput() {
     const now = performance.now();
     velocity = (e.clientY - lastY) / Math.max(1, now - lastT);
     lastY = e.clientY; lastT = now;
-    target = startTarget - dy / (cardH * 0.55);
+    target = startTarget - dy / pitch;
     kick();
   });
   const end = () => {
@@ -417,7 +349,7 @@ function bindInput() {
     dragging = false;
     wheel.classList.remove("dragging");
     if (moved) {
-      const fling = Math.max(-1, Math.min(1, -velocity * 0.9));
+      const fling = Math.max(-1, Math.min(1, -velocity * 0.6));
       target = Math.round(target + fling);
       kick();
     }
@@ -425,29 +357,21 @@ function bindInput() {
   window.addEventListener("pointerup", end);
   window.addEventListener("pointercancel", end);
 
-  // click: the active card opens the site, the others bring themselves to the front
+  // click: the active name opens the site, the others roll into place
   wheel.addEventListener("click", (e) => {
-    const card = e.target.closest(".card");
-    if (!card) return;
+    const item = e.target.closest(".item");
+    if (!item) return;
     if (moved) { e.preventDefault(); moved = false; return; }
-    const i = Number(card.dataset.i);
+    const i = Number(item.dataset.i);
     const d = mod(i - Math.round(target) + COUNT / 2, COUNT) - COUNT / 2;
     if (d !== 0) { e.preventDefault(); step(d); }
   });
   wheel.addEventListener("dragstart", (e) => e.preventDefault());
 
-  // stop horizontal/vertical page gestures on touch devices from bouncing the page
-  stage.style.touchAction = "none";
-
   let resizeRaf = 0;
   window.addEventListener("resize", () => {
     cancelAnimationFrame(resizeRaf);
-    resizeRaf = requestAnimationFrame(() => {
-      measure();
-      render();
-      const layer = nameWrap.querySelector(".name-layer:last-child");
-      if (layer) fitName(layer);
-    });
+    resizeRaf = requestAnimationFrame(() => { measure(); render(); });
   });
 }
 
@@ -464,12 +388,7 @@ function setLang(next, persist) {
   wheel.setAttribute("aria-label", COPY[lang].carousel);
   indexNav.setAttribute("aria-label", COPY[lang].carousel);
   buildAboutList();
-  if (activeProject > -1) {
-    const project = PROJECTS[activeProject];
-    $("#infoDesc").textContent = project[lang].desc;
-    $("#infoRole").textContent = project[lang].role;
-    $("#visitLabel").textContent = `${COPY[lang].visit} ${project.domain}`;
-  }
+  if (activeProject > -1) applyInfo(PROJECTS[activeProject]);
   if (persist) { try { localStorage.setItem("lang", lang); } catch (_) { /* ignore */ } }
 }
 
@@ -547,7 +466,7 @@ function playIntro() {
       );
     });
 
-    // the cards rise into the stack while the name leaves
+    // the project names rise into the wheel while the intro leaves
     const start = performance.now();
     const DURATION = 1500;
     const rise = (now) => {
@@ -564,7 +483,7 @@ function playIntro() {
 /* ------------------------------------------------------------------- init */
 
 function init() {
-  buildCards();
+  buildItems();
   buildIndex();
   setLang(lang, false);
   measure();
@@ -577,10 +496,7 @@ function init() {
 
   // type metrics change once the webfont arrives
   if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(() => {
-      const layer = nameWrap.querySelector(".name-layer:last-child");
-      if (layer) fitName(layer);
-    });
+    document.fonts.ready.then(() => { measure(); render(); });
   }
 
   playIntro();
